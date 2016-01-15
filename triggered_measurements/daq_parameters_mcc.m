@@ -31,12 +31,15 @@ settings.daq_hw_id = '1';                 % Hardware ID
 % input is needed for this parameter, otherwise the necessary samples per
 % trigger is calculated automatically
 
-settings.duration = 0.01;                 % Duration of sample (seconds)
+% !! define duration by file input stimulus-PC !!
+settings.duration = 0.05;                 % Duration of sample (seconds)
+
 settings.sample_rate = 100000;            % Set sample rate (Hz), max = 200000Hz, min = 1Hz.
 settings.trigger_type = 'Immediate';      % Set trigger type -> Triggerd immediate when start is executed
 settings.trigger_type = 'HwDigital';      % Set trigger type -> Triggerd from hardware (digital channel) TTL
-settings.trigger_cond = 'TrigPosEdge';    % Set trigger condition -> Triggered when a positive edge is detected
-settings.trigger_repeat = 9;              % the amount of triggered samples to be taken if false than default
+% settings.trigger_cond = 'TrigPosEdge';    % Set trigger condition -> Triggered when a positive edge is detected
+settings.trigger_cond = 'TrigNegEdge';    % Set trigger condition -> Triggered when a negative edge is detected -> TTL convention used by stimulus-PC.
+settings.trigger_repeat = 1;              % the amount of triggered samples to be taken if false than default
                                           % when counted 0 is 1, but cannot be used eg. 10 -> 11 triggers
 settings.samples_per_trigger = 0;         % Sets samples per trigger manually if not equal to 0.
                                          
