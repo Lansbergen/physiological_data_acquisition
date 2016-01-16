@@ -15,6 +15,8 @@ init = true;   % initialize, yes=true no=false
 %                 - file-output.
 %            - SL - Added control for pc-unix-mac -> but no functionallity.
 %            - SL - Added summary session to screen.
+% 16-1-2016  - SL - Added input_arg to parameters function, enabling the
+%                 - acquisition to run in Simulation for Beta testing
 %
 %
 %
@@ -39,6 +41,10 @@ echo off        % No echoing of commands lines in script/function files
 end
 %-------------------------------------------------------------------------%
 
+% Simulate acquisition outside InVivoTools
+input_arg.simulate = true;
+% input_arg.simulate = false;
+
 % put in checks for pc system pcwin, unix, mac-os
 % to generalize code and improve compatibility
 
@@ -57,7 +63,7 @@ elseif ismac == 1;
 end
 
 % Get MCC specific parameters and analog input object readily configured
-[ai, settings] = daq_parameters_mcc();    % get ai object and settings
+[ai, settings] = daq_parameters_mcc( input_arg );    % get ai object and settings
 start (ai);                               % activate ai object
 disp(' ');disp(' ');
 disp('*** Pre-configured Analog Input ***');
@@ -116,7 +122,14 @@ while triggers_remaining ~= 0
         % create output file name and save
         file_string = 'test_data%d.txt';
         file_str = sprintf(file_string,index);
-        save(file_str,'data','time','-ascii');
+        
+        % !! remove if done with simulation !!
+        if settings.simulate == true        
+            save(file_str,'data','time','-ascii');
+        else
+            save_to = fullfile(settings.data_dir,file_str);
+            save(save_to,'data','time','-ascii');
+        end
         
         % display progress
         ok_string = 'saved data to test_data%d.txt succesfully';
@@ -142,7 +155,12 @@ end
 % save and output progress
 file_string = 'test_data%d.txt';
 file_str = sprintf(file_string,index);
-save(file_str,'data','time','-ascii');
+if settings.simulate == true        
+            save(file_str,'data','time','-ascii');
+        else
+            save_to = fullfile(settings.data_dir,file_str);
+            save(save_to,'data','time','-ascii');
+end
 ok_string = 'saved data to test_data%d.txt succesfully';
 ok_str = sprintf(ok_string,index);
 disp(' '); disp(ok_str); disp(' ');
