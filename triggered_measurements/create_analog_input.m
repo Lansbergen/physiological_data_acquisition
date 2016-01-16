@@ -7,6 +7,10 @@ function [ ai, ai_channel_setting ] = create_analog_input( settings )
 %   ai_channel_settings gives detailed information about analog input
 %   configuration.
 %
+%   Includes addition of runtrigger callback function, executed/called back
+%   when triggered by TTL.
+%
+%
 %   (c) 2016, Simon Lansbergen.
 %
 
@@ -37,7 +41,8 @@ end
 % Add channels to Analog Input Object
 ai_channel_setting = addchannel(ai,settings.hwchannels,settings.hwnames);
 
-
+% add runtrigger callback function, executed when triggered by TTL pulse
+ai.TriggerFcn = {@run_trigger,settings};
 
 end
 

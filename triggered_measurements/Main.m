@@ -1,5 +1,7 @@
 %-------------------------------------------------------------------------%
+
 init = true;   % initialize, yes=true no=false
+
 %-------------------------------------------------------------------------%
 % 
 % Software written by Simon Lansbergen, (c)2016.
@@ -40,10 +42,25 @@ end
 echo off        % No echoing of commands lines in script/function files
 end
 %-------------------------------------------------------------------------%
+% Simulate acquisition outside InVivoTools? true/false
 
-% Simulate acquisition outside InVivoTools
-input_arg.simulate = true;
-% input_arg.simulate = false;
+input_arg.simulate = false;
+
+%-------------------------------------------------------------------------%
+
+% check running in simulation mode
+if input_arg.simulate == true
+    disp(' ');
+    disp(' *** Running in simulation mode - Outside InVivoTools ***');
+    disp(' ');
+    disp(' -> Test output saved to active folder.');
+    disp(' -> Acquisition duration set manually in daq_parameter function.');
+    disp(' -> See parameter setting manual......?');
+    disp(' ');
+    disp(' *** Hit key to continue ***');
+    disp(' ');
+    pause; clc; 
+end 
 
 % put in checks for pc system pcwin, unix, mac-os
 % to generalize code and improve compatibility
@@ -75,18 +92,6 @@ disp(' ');
 disp(' ');
 disp(ai);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Data Aqcuisition Timing %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Timing is obtained by reading a timer file, or by extracting the total
-% number of blocks/timeslots of each measuring session. The latter is
-% multiplied by 10 sec and an additional 10 seconds are added to the total
-% acquisition time per session. 
-% 
-% Timing between sessions is less critical in terms of speed. This will not
-% exceed the time it takes to load the parameters and Analog Input Object
-% and should be at least more than a minute.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -104,7 +109,7 @@ index = 1;      % start index for save file <- temp?
 triggers_remaining = (ai.TriggerRepeat + 1) - ai.TriggersExecuted;
 
 % output information on screen
-remain_string = 'Remaining triggers : %d';
+remain_string = 'Remaining Sessions : %d';
 remain_str = sprintf(remain_string,triggers_remaining);
 wait_string = ' *** Waiting for trigger number : %d ***';
 wait_str = sprintf(wait_string,index);
@@ -118,7 +123,7 @@ while triggers_remaining ~= 0
         
         % get actual data
         [ data, time ] = getdata(ai);
-        
+                
         % create output file name and save
         file_string = 'test_data%d.txt';
         file_str = sprintf(file_string,index);
@@ -135,7 +140,7 @@ while triggers_remaining ~= 0
         ok_string = 'saved data to test_data%d.txt succesfully';
         ok_str = sprintf(ok_string,(index));
         disp(' '); disp(ok_str); disp(' '); disp(' '); disp(' ');
-        remain_string = 'Remaining triggers : %d';
+        remain_string = 'Remaining Sessions : %d';
         remain_str = sprintf(remain_string,triggers_remaining);
         wait_string = ' *** Waiting for trigger number : %d ***';
         wait_str = sprintf(wait_string,index + 1);
@@ -165,6 +170,25 @@ ok_string = 'saved data to test_data%d.txt succesfully';
 ok_str = sprintf(ok_string,index);
 disp(' '); disp(ok_str); disp(' ');
  
+% loop to implement in code checks if file is changed
+
+% while 1
+%     acqready_props = dir(acqready);
+%     if ~isempty(acqready_props) && acqready_props.datenum > acqready_props_prev.datenum
+%         logmsg('acqReady changed');
+%         acqready_props_prev = acqready_props;
+%         fid = fopen(acqready,'r');
+%         fgetl(fid); % pathSpec line
+%         datapath = fgetl(fid);
+%         fclose(fid);
+% 	
+% 	wc_startpi(datapath);
+%     else
+%         pause(0.3);
+%     end
+
+
+
 
 %%%%%%%%%%%%%%%%%
 %%% Plot Data %%%
@@ -196,9 +220,9 @@ disp(' ');disp(' ');
 % *************************************
 
 % Stop acquire data
-stop(ai);       % Stops (all active processes on) analog input object
-delete(ai);     % Deletes analog input object
-clear ai        % Removes analog input object from workspace
+% stop(ai);       % Stops (all active processes on) analog input object
+% delete(ai);     % Deletes analog input object
+% clear ai        % Removes analog input object from workspace
 
 % clear data in workspace
 % clear         % disable in debug mode

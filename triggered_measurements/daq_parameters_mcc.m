@@ -7,6 +7,7 @@ function [ ai, settings ] = daq_parameters_mcc( input_arg )
 %
 %   MCC DAQ PCI DAS-6025 has a fixed 12 bits per sample and 8 analog 
 %   differential inputs.
+%
 %    
 %   (c) 2016, Simon Lansbergen.
 %   
@@ -31,25 +32,40 @@ settings.daq_hw_id = '1';                 % Hardware ID
 % input is needed for this parameter, otherwise the necessary samples per
 % trigger is calculated automatically
 
-% !! define duration by file input stimulus-PC !!
-settings.duration = 0.05;                 % Duration of sample (seconds)
 settings.sample_rate = 100000;            % Set sample rate (Hz), max = 200000Hz, min = 1Hz.
 settings.trigger_type = 'Immediate';      % Set trigger type -> Triggerd immediate when start is executed
 settings.trigger_type = 'HwDigital';      % Set trigger type -> Triggerd from hardware (digital channel) TTL
 % settings.trigger_cond = 'TrigPosEdge';    % Set trigger condition -> Triggered when a positive edge is detected
 settings.trigger_cond = 'TrigNegEdge';    % Set trigger condition -> Triggered when a negative edge is detected -> TTL convention used by stimulus-PC.
 settings.samples_per_trigger = 0;         % Sets samples per trigger manually if not equal to 0.
+settings.trigger_repeat = 1;              % the amount of triggered samples to be taken if false than default
+                                          % when counted 0 is 1, but cannot be used eg. 10 -> 11 triggers
+                                  
+                             
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Data Aqcuisition Timing %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Timing is obtained by reading a timer file, or by extracting the total
+% number of blocks/timeslots of each measuring session. The latter is
+% multiplied by 10 sec and an additional 10 seconds are added to the total
+% acquisition time per session. 
+%    
+% Timing between sessions is less critical in terms of speed. This will not
+% exceed the time it takes to load the parameters and Analog Input Object
+% and should be at least more than a minute.                                        
 
 %%% Retrieve trigger information and save directory reference from Stimulus-PC %%%
-
 if input_arg.simulate == true
-settings.trigger_repeat = 0;              % the amount of triggered samples to be taken if false than default
-                                          % when counted 0 is 1, but cannot be used eg. 10 -> 11 triggers
+settings.duration = 10;                  % Duration of sample (seconds)
 else
-[settings.trigger_number, settings.data_dir] = load_reference;
-settings.trigger_repeat = (settings.trigger_number - 1); 
+[settings.block_number, settings.data_dir] = load_reference;
+% Duration is number of blocks times 10 sec + an additional 10 sec. 
+% FIXED TIMING PARAMETER
+settings.duration = (settings.block_number * 10) + 10;                 
 end
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%% Channel Settings %%%
@@ -67,19 +83,20 @@ settings.hwnames = [{'diff 1'}];           % Give name to channels
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Create Analog Input Object %%%
+%%% Create Analog Input Object %%%      <- Important latest step !!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Get analog input with settings struct as an input.
 % Calls function to receive readily configured analog input object.
+% Trigger callback function set in create_input() function.
+[ai, ai_channel_setting] = create_analog_input(settings);     
 
-[ ai, ai_channel_setting ] = create_analog_input(settings);     
 
+
+% add miscellaneous to settings struct
 settings.ai_channel_setting = ai_channel_setting;
-settings.ai_propinfo = propinfo(ai);
-
-
-settings.simulate = input_arg.simulate;
+settings.ai_propinfo        = propinfo(ai);
+settings.simulate           = input_arg.simulate;
 
 end
 
