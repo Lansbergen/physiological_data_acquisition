@@ -44,22 +44,13 @@ end
 %-------------------------------------------------------------------------%
 % Simulate acquisition outside InVivoTools? true/false
 
-input_arg.simulate = false;
+input_arg.simulate = true;
 
 %-------------------------------------------------------------------------%
 
 % check running in simulation mode
 if input_arg.simulate == true
-    disp(' ');
-    disp(' *** Running in simulation mode - Outside InVivoTools ***');
-    disp(' ');
-    disp(' -> Test output saved to active folder.');
-    disp(' -> Acquisition duration set manually in daq_parameter function.');
-    disp(' -> See parameter setting manual......?');
-    disp(' ');
-    disp(' *** Hit key to continue ***');
-    disp(' ');
-    pause; clc; 
+    [input_arg.save_dir_temp] = daq_simulation();
 end 
 
 % put in checks for pc system pcwin, unix, mac-os
@@ -82,6 +73,9 @@ end
 % Get MCC specific parameters and analog input object readily configured
 [ai, settings] = daq_parameters_mcc( input_arg );    % get ai object and settings
 start (ai);                               % activate ai object
+
+
+% info on configuration
 disp(' ');disp(' ');
 disp('*** Pre-configured Analog Input ***');
 disp(' ');
@@ -92,7 +86,15 @@ disp(' ');
 disp(' ');
 disp(ai);
 
-
+% info on total session(s)
+session_number = (ai.TriggerRepeat + 1);
+session_info_string = ' -> Total session(s) this run : %d';
+session_info_str = sprintf(session_info_string, session_number);
+disp(' ');
+disp(' *** Acquisition waiting for trigger(s) ***');
+disp(' ');
+disp(session_info_str);
+disp(' ');
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%% Data Aqcuisition %%%
@@ -104,71 +106,18 @@ disp(ai);
 % acquisition buffer. The last session is saved outside the main while
 % loop.
 
-% set local variables
-index = 1;      % start index for save file <- temp?
-triggers_remaining = (ai.TriggerRepeat + 1) - ai.TriggersExecuted;
 
-% output information on screen
-remain_string = 'Remaining Sessions : %d';
-remain_str = sprintf(remain_string,triggers_remaining);
-wait_string = ' *** Waiting for trigger number : %d ***';
-wait_str = sprintf(wait_string,index);
-disp(' '); disp(remain_str); disp(' '); disp(wait_str);
 
-% main loop
-while triggers_remaining ~= 0 
-    
-    % acquisition and save loop
-    if ai.SamplesAvailable ~= 0
-        
-        % get actual data
-        [ data, time ] = getdata(ai);
-                
-        % create output file name and save
-        file_string = 'test_data%d.txt';
-        file_str = sprintf(file_string,index);
-        
-        % !! remove if done with simulation !!
-        if settings.simulate == true        
-            save(file_str,'data','time','-ascii');
-        else
-            save_to = fullfile(settings.data_dir,file_str);
-            save(save_to,'data','time','-ascii');
-        end
-        
-        % display progress
-        ok_string = 'saved data to test_data%d.txt succesfully';
-        ok_str = sprintf(ok_string,(index));
-        disp(' '); disp(ok_str); disp(' '); disp(' '); disp(' ');
-        remain_string = 'Remaining Sessions : %d';
-        remain_str = sprintf(remain_string,triggers_remaining);
-        wait_string = ' *** Waiting for trigger number : %d ***';
-        wait_str = sprintf(wait_string,index + 1);
-        disp(remain_str); disp(' '); disp(wait_str);
-        
-        % give index +1 after acquisition and save statements
-        index = index + 1;      
-    end
-    
-    % calculate remaining triggers again to progress in while loop
-    triggers_remaining = (ai.TriggerRepeat + 1) - ai.TriggersExecuted;
+
+while strcmp(ai.Running,'On')
+
+    % what to do in this loop, and how to show progres?
+   
 end
 
-% get data from the last session, which the loops jumps over
-[ data, time ] = getdata(ai);
 
-% save and output progress
-file_string = 'test_data%d.txt';
-file_str = sprintf(file_string,index);
-if settings.simulate == true        
-            save(file_str,'data','time','-ascii');
-        else
-            save_to = fullfile(settings.data_dir,file_str);
-            save(save_to,'data','time','-ascii');
-end
-ok_string = 'saved data to test_data%d.txt succesfully';
-ok_str = sprintf(ok_string,index);
-disp(' '); disp(ok_str); disp(' ');
+
+
  
 % loop to implement in code checks if file is changed
 
@@ -189,30 +138,14 @@ disp(' '); disp(ok_str); disp(' ');
 
 
 
-
-%%%%%%%%%%%%%%%%%
-%%% Plot Data %%%
-%%%%%%%%%%%%%%%%%
-
-% Plot data just for now as a control mechanism
-
-% figure;
-% plot(time,data);
-% xlabel('Time (s)');         % Setting up the xlabel
-% ylabel('Signal (Volts)');   % Setting up the ylabel
-% title('Data Acquired');     % Setting up the title
-% legend(settings.hwnames);
-% grid on; 
-
-
 %%%%%%%%%%%%%%%%%%%%%%%
 %%% Summary Session %%%
 %%%%%%%%%%%%%%%%%%%%%%%
 
-disp(' ');disp(' ');disp(' ');
-disp(' *** Summary Acquisition Session ***');
-showdaqevents(ai);
-disp(' ');disp(' ');
+% disp(' ');disp(' ');disp(' ');
+% disp(' *** Summary Acquisition Session ***');
+% showdaqevents(ai);
+% disp(' ');disp(' ');
 
 
 % *************************************

@@ -12,6 +12,10 @@ function [ ai, settings ] = daq_parameters_mcc( input_arg )
 %   (c) 2016, Simon Lansbergen.
 %   
 
+if input_arg.simulate == true
+    settings.data_dir = input_arg.save_dir_temp;
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Hardware Settings %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -31,8 +35,13 @@ settings.daq_hw_id = '1';                 % Hardware ID
 % Change settings.samples_per_trigger to a value other than 0 if a manual
 % input is needed for this parameter, otherwise the necessary samples per
 % trigger is calculated automatically
+%
+% see also propinfo(ai) and help propinfo for detailed information on 
+% parameter settings.
 
-settings.sample_rate = 100000;            % Set sample rate (Hz), max = 200000Hz, min = 1Hz.
+settings.sample_rate = 10000;             % Set sample rate (Hz), max = 200000Hz, min = 1Hz.
+
+
 settings.trigger_type = 'Immediate';      % Set trigger type -> Triggerd immediate when start is executed
 settings.trigger_type = 'HwDigital';      % Set trigger type -> Triggerd from hardware (digital channel) TTL
 % settings.trigger_cond = 'TrigPosEdge';    % Set trigger condition -> Triggered when a positive edge is detected
@@ -97,6 +106,7 @@ settings.hwnames = [{'diff 1'}];           % Give name to channels
 settings.ai_channel_setting = ai_channel_setting;
 settings.ai_propinfo        = propinfo(ai);
 settings.simulate           = input_arg.simulate;
+
 
 end
 
