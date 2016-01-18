@@ -1,19 +1,16 @@
 function run_trigger(ai,event,settings)
-%runtrigger is used for displaying acquisistion progress
+%run_trigger is called when triggered and ensures that session data is
+%recorded and saved accordingly
 %   
-%   Nothing here yet.
+%   The function run_trigger gets the Analog Input Object as an input as
+%   well as some event information and parameter settings struct. Each new
+%   session is saved to a pre-set data directory (set by the stimulus-PC).
 %    
 %   (c) 2016, Simon Lansbergen.
 % 
 
 % session number is equal to the trigger number
 index = event.Data.Trigger;  
-
-% str_body = 'Total Acquisition time session %d : %d (seconds).';
-% str_out = sprintf(str_body,index,settings.duration);
-% disp(' ');
-% disp(str_out);
-% disp(' ');
 
 % wait to block Matlab during acquisition time, with an additional 5
 % seconds for safety.
@@ -27,7 +24,6 @@ file_string = 'test_data%d.txt';
 file_str = sprintf(file_string,index);
 save_to = fullfile(settings.data_dir,file_str);
 save(save_to,'data','time','-ascii');
-
 
 % Done acquiring and saving session data
 done_string = ' -> Done acquiring and saving session : %d.';

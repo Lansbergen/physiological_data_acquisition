@@ -41,8 +41,9 @@ end
 % Add channels to Analog Input Object
 ai_channel_setting = addchannel(ai,settings.hwchannels,settings.hwnames);
 
-% add runtrigger callback function, executed when triggered by TTL pulse
-ai.TriggerFcn = {@run_trigger,settings};
+% add run_trigger callback function, executed when triggered by TTL pulse
+set(ai, 'TriggerFcn', {@run_trigger,settings});
+
 
 end
 

@@ -8,6 +8,7 @@ function [ ai, settings ] = daq_parameters_mcc( input_arg )
 %   MCC DAQ PCI DAS-6025 has a fixed 12 bits per sample and 8 analog 
 %   differential inputs.
 %
+%   -> to be completed
 %    
 %   (c) 2016, Simon Lansbergen.
 %   
@@ -47,7 +48,7 @@ settings.trigger_type = 'HwDigital';      % Set trigger type -> Triggerd from ha
 % settings.trigger_cond = 'TrigPosEdge';    % Set trigger condition -> Triggered when a positive edge is detected
 settings.trigger_cond = 'TrigNegEdge';    % Set trigger condition -> Triggered when a negative edge is detected -> TTL convention used by stimulus-PC.
 settings.samples_per_trigger = 0;         % Sets samples per trigger manually if not equal to 0.
-settings.trigger_repeat = 1;              % the amount of triggered samples to be taken if false than default
+settings.trigger_repeat = 0;              % the amount of triggered samples to be taken if false than default
                                           % when counted 0 is 1, but cannot be used eg. 10 -> 11 triggers
                                   
                              
@@ -101,11 +102,23 @@ settings.hwnames = [{'diff 1'}];           % Give name to channels
 [ai, ai_channel_setting] = create_analog_input(settings);     
 
 
-
-% add miscellaneous to settings struct
+% Add miscellaneous to settings struct
 settings.ai_channel_setting = ai_channel_setting;
 settings.ai_propinfo        = propinfo(ai);
 settings.simulate           = input_arg.simulate;
+
+
+% info on configuration
+disp(' ');disp(' ');
+disp('*** MCC PCI DAS-6025 Pre-configured Analog Input ***');
+disp(' ');
+disp('Look into parameter function file to set specific');
+disp('configuration settings displayed below and found in');
+disp('settings. -> help daq_parameters_mcc()');
+disp(' ');
+disp(' ');
+% show summarized information Analog Input object
+disp(ai);
 
 
 end
