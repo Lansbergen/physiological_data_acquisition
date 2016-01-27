@@ -1,4 +1,4 @@
-function [ block_number, data_dir] = load_reference()
+function [ block_number, data_dir] = load_reference
 %load_reference gives acquisition trigger parameter and save directory to parameter function.
 %
 %   This function loads the number of acquisition blocks triggerd by an
@@ -22,33 +22,20 @@ function [ block_number, data_dir] = load_reference()
 %    
 %   (c) 2016, Simon Lansbergen.
 %   
-%   Currently the function is still working outside InVivoTools (fixed
-%   simulated)!
-%
 
-% read-in acqReady
-% for testing outside InVivoTools
 
-filepath = 'C:\Data\stims\acqReady';
-test = fullfile(filepath);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Get Global_Comm varaiables %%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% get global variables
+remotecommglobals;
+acqready = fullfile(Remote_Comm_dir,'acqReady');
 delimiterIn = '	';
 
-% !! Use when implemented in InVivoTools !!
-
-% remotecommglobals;
-% acqready = fullfile(Remote_Comm_dir,'acqReady');
-%
-% AND TEST FOR EXISTENCE (maybe try loop?)
-
-
-
-
-% !! From this point on no testing code !!
-
-% Reomve variable test from path_data
 
 % import data
-path_data = importdata(test,delimiterIn);
+path_data = importdata(acqready,delimiterIn);
 
 % convert cell to string
 temp = cell2mat(path_data(2));
@@ -60,13 +47,19 @@ temp = cell2mat(path_data(2));
 data_dir_file = fullfile(temp,'acqParams_in');
 data_dir = fullfile(temp);
 
-% get retrieve total amount of blocks to time each acquisition session
+
+% retrieve total amount of blocks to time each acquisition session. the
+% loop is needed because there is a short delay between the systems
+while exist(data_dir_file,'file') == 0
+logmsg('wait for acqParams_in to be ready')
+end
+
+% import block and stimulus duration information.
+% fixed settings
 stimulus_data = importdata(data_dir_file);
 block_number = stimulus_data.data(2);
 
 % when fully loaded, output ok message to screen
-disp(' ');
-disp(' *** Loaded reference data from Stimulus-PC correctly ***');
-disp(' ');
+disp(' '); logmsg(' *** Loaded reference data from Stimulus-PC correctly ***');
 
 end

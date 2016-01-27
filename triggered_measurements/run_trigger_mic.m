@@ -1,6 +1,6 @@
-function run_trigger(ai,event,settings)
-%run_trigger is called when triggered and ensures that session data is
-%recorded and saved accordingly
+function run_trigger_mic(ai_mic,event_mic,settings)
+%run_trigger_mic is called when triggered and ensures that session data is
+%recorded and saved accordingly for the dedicated microphone config
 %   
 %   The function run_trigger gets the Analog Input Object as an input as
 %   well as some event information and parameter settings struct. Each new
@@ -16,19 +16,19 @@ function run_trigger(ai,event,settings)
 
 % wait to block Matlab during acquisition time, with an additional 0.5
 % seconds for safety.
-wait(ai,(settings.duration + 0.5));
+wait(ai_mic,(settings.duration + 0.5));
 
 % get actual data
-[data, time] = getdata(ai);
+[data, time] = getdata(ai_mic);
 
 % save both time and data, as well as hardware and c
-file_str = 'physiological_data';
+file_str = 'ultra_sound_data';
 save_to = fullfile(settings.data_dir,file_str);
-channel_settings = ai.Channel;
+channel_settings = ai_mic.Channel;
 save(save_to,'data','time','channel_settings');
 
 % Done acquiring and saving session data
-done_msg = sprintf('\n \n Done acquiring and saving session \n \n');
+done_msg = sprintf('\n \n Done acquiring and saving microphone recordings \n \n');
 logmsg(done_msg);
 
 end

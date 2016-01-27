@@ -1,5 +1,5 @@
 %-------------------------------------------------------------------------%
-init = true;   % initialize ?
+init = false;   % initialize ?
 %-------------------------------------------------------------------------%
 % 
 % Software written by Simon Lansbergen, (c)2016.
@@ -74,17 +74,17 @@ HW_Info_AI = daqhwinfo(AI);         % AI object hardware info
 Prop_Info_AI = propinfo(AI);        % AI object property info (object setup)
 
 % Define input channels MCC DAQ
-%hwchannels = [0 1]; % DAQ channel input Sinks
-hwchannels = [0]; % DAQ channel input Sinks
-% InpFunGen = addchannel(AI,hwchannels,{'diff 0','diff 1'});
-InpFunGen = addchannel(AI,hwchannels,'diff 0');
+hwchannels = [0 1]; % DAQ channel input Sinks
+% hwchannels = [0]; % DAQ channel input Sinks
+InpFunGen = addchannel(AI,hwchannels,{'diff 0','diff 1'});
+% InpFunGen = addchannel(AI,hwchannels,'diff 0');
 
 disp('*********************************');
 disp('***        Channel info       ***');
 disp('*********************************');
 disp(InpFunGen);    % Output AI object info
 
-% start(AI);          % Run AI object
+start(AI);          % Run AI object
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -111,7 +111,7 @@ disp('***********************************');
 disp('****  Start recording process  ****');
 disp('***********************************');
 
-% [data, time] = getdata(AI);
+[data, time] = getdata(AI);
 
 disp('');disp('');
 disp('***********************************');
@@ -137,5 +137,6 @@ disp('***********************************');
 % stop(AI);
 % delete(AI);
 
-
-
+save('c:\temp\test','data','time')
+% clear data time
+% load('c:\temp\test','data','time')

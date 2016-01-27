@@ -1,6 +1,6 @@
 %-------------------------------------------------------------------------%
 
-init = true;   % initialize, yes=true no=false
+init = false;   % initialize, yes=true no=false
 
 %-------------------------------------------------------------------------%
 % 
@@ -47,19 +47,23 @@ close all       % Close all current windows with figures (plots)
 clc             % Clear Command window
 if (~isempty(daqfind)) % finds and stops active data acquisistion-
     stop(daqfind)      % objects and terminates them
-end
+end 
 echo off        % No echoing of commands lines in script/function files
 end
 %-------------------------------------------------------------------------%
 % Simulate acquisition outside InVivoTools? true/false
 
-input_arg.simulate = true;
+input_arg.simulate = false;
 
 %-------------------------------------------------------------------------%
 
 % check running in simulation mode
 if input_arg.simulate == true
     [input_arg.save_dir_temp] = daq_simulation();
+end 
+
+if (~isempty(daqfind)) % finds and stops active data acquisistion-
+    stop(daqfind)      % objects and terminates them
 end 
 
 
@@ -114,7 +118,7 @@ disp(' ');
 
 % The main while loop runs as long as the Analog Input Objects is active,
 % either waiting for an external trigger or acquiring session data. When 
-% there are no triggers left and no active acquisition, the loop breaks.
+% there are  no triggers left and no active acquisition, the loop breaks.
 % The aqcuisition and saving this data is done in the run_trigger trigger
 % call back function
 
@@ -175,6 +179,9 @@ end
 % delete(ai);     % Deletes analog input object
 % clear ai        % Removes analog input object from workspace
 
-% clear data in workspace
+% clear data in workspace ?
 % clear         % disable in debug mode
+
+
+
 

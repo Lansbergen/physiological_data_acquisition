@@ -4,7 +4,9 @@ function [ save_dir_temp ] = daq_simulation()
 %      
 %   The function test if c:\temp exist and if not creates the directory.
 %   The directory is also given to the daq_parameter function.
-
+%    
+%   2016, Simon Lansbergen.
+% 
 
 % set temp save directory for testing purpose
 save_dir_temp = fullfile('c:','temp');  
