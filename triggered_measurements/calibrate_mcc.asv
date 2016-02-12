@@ -4,16 +4,14 @@ function calibrate_mcc(time_frame)
 %   CALIBRATE_MCC(time_frame), timeframe set the temporal resolution in
 %   seconds (e.g. 0.001 input equals 1 msec). Default resolution is .1 sec
 %   when no input is given. Input example: calibrate_mcc 0.1
-%
-%   Change channels settings manual in code! -> change to function input
 %    
 %   2016, Simon Lansbergen.
 %   
 
 % sets resolution to default when time_frame is not defined.
-if nargin == 1
+if nargin==1
     time_frame = str2double(time_frame);
-elseif nargin < 1 
+elseif nargin<1 
     time_frame = 0.1;    
 end
 
@@ -35,7 +33,7 @@ AI = analoginput(settings.daq_type,settings.daq_hw_id);
 channels = [0]
 addchannel(AI,channels);
 
-% addchannel(AI,settings.hwchannels,settings.hwnames);
+addchannel(AI,settings.hwchannels,settings.hwnames);
 
 % get info on Analog Input Object
 DAQInfoAI = daqhwinfo(AI);

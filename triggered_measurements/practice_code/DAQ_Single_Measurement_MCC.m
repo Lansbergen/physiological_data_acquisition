@@ -25,12 +25,15 @@ echo off        % No echoing of commands lines in script/function files
 end
 %-------------------------------------------------------------------------%
 
-
+% set(AI, 'TimerPeriod', 0.1);
+% set(AI, 'TimerFcn', @daqtimerplot);
+% add run_trigger callback function, executed when triggered by TTL pulse
+% set(ai, 'TriggerFcn', {@run_trigger_test});
 
 % Parameter settings
-Settings.Duration = 0.05;                 % Duration of sample (seconds)
+Settings.Duration = 20;                 % Duration of sample (seconds)
 Settings.Daq_Type = 'mcc';              % Set adapter type
-Settings.Sample_Rate = 10000;            % Set sample rate (Hz)
+Settings.Sample_Rate = 1000;            % Set sample rate (Hz)
 % MCC has a fixed 12 bits per sample.
 % Settings.Bits = 32;                     % Set bits per sample
 Settings.Trigger_Type = 'Immediate';    % Set trigger type
@@ -74,37 +77,24 @@ HW_Info_AI = daqhwinfo(AI);         % AI object hardware info
 Prop_Info_AI = propinfo(AI);        % AI object property info (object setup)
 
 % Define input channels MCC DAQ
-hwchannels = [0 1]; % DAQ channel input Sinks
-% hwchannels = [0]; % DAQ channel input Sinks
-InpFunGen = addchannel(AI,hwchannels,{'diff 0','diff 1'});
-% InpFunGen = addchannel(AI,hwchannels,'diff 0');
+% hwchannels = [0 1]; % DAQ channel input Sinks
+hwchannels = [0]; % DAQ channel input Sinks
+% InpFunGen = addchannel(AI,hwchannels,{'diff 0','diff 1'});
+InpFunGen = addchannel(AI,hwchannels,'Pulse Oxi Meter');
 
 disp('*********************************');
 disp('***        Channel info       ***');
 disp('*********************************');
 disp(InpFunGen);    % Output AI object info
 
+% test realtime output
+set(AI, 'TimerPeriod', 1);
+set(AI, 'TimerFcn', @daqtimerplot);
+
+
+% start AI
 start(AI);          % Run AI object
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Setup continuous acquisistion %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The best practice is to use the wait command before bringing the data in 
-% to MATLAB®. Set the duration of the wait command to be more than the 
-% actual duration of the acquisition. This ensures that the object has 
-% sufficient time to acquire the data even with system overhead with object 
-% setup and triggering. The recommended wait time is 110% of the duration 
-% +0.5 seconds. The wait function returns to MATLAB as soon as the
-% acquisition completes and does not pause execution for the whole waitTime.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Test for wait time
-waitTime = Settings.Duration * 1.1 + 0.5;   % set wait time
-% tic
-% wait(AI, waitTime);
-% waitTime
-% toc
 
 % Start acquire data
 disp('***********************************');
@@ -137,6 +127,6 @@ disp('***********************************');
 % stop(AI);
 % delete(AI);
 
-save('c:\temp\test','data','time')
+% save('c:\temp\test','data','time')
 % clear data time
 % load('c:\temp\test','data','time')

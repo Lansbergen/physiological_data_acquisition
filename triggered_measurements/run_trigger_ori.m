@@ -10,12 +10,7 @@ function run_trigger(ai,event,settings)
 %   as one channel each collum. So when multiple channels are simultaneously
 %   saved, all data is stored in one variable with number of collums
 %   related to the configured channels.
-%   
-%   Calculates the heart and breath rate by Gaussian smoothing at a pre set
-%   value, which can be changed in daq_parameters settings script.
-%
-%       -> TO DO: make Gaussian blur variable availible in script!
-%
+%    
 %   (c) 2016, Simon Lansbergen.
 % 
 
@@ -27,14 +22,11 @@ wait(ai,(settings.duration + 0.5));
 % get actual data
 [data, time] = getdata(ai);
 
-smooth_hr = smoothen(data,150);        % Smoothen heart rate
-smooth_br = smoothen(data,1000);       % Smoothen breath rate
-
-% save both time and data, as well as hardware and configution
+% save both time and data, as well as hardware and c
 file_str = 'physiological_data';
 save_to = fullfile(settings.data_dir,file_str);
 channel_settings = ai.Channel;
-save(save_to,'data','smooth_br','smooth_hr','time','channel_settings','-v7');
+save(save_to,'data','time','channel_settings');
 
 % Done acquiring and saving session data
 done_msg = sprintf('\n \n Done acquiring and saving session \n \n');
