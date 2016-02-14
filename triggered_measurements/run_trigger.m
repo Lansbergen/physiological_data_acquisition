@@ -34,7 +34,7 @@ smooth_br = smoothen(data,1000);       % Smoothen breath rate
 file_str = 'physiological_data';
 save_to = fullfile(settings.data_dir,file_str);
 channel_settings = ai.Channel;
-save(save_to,'data','smooth_br','smooth_hr','time','channel_settings','-v7');
+save(save_to,'data','smooth_br','smooth_hr','time','settings','-v7');
 
 % Done acquiring and saving session data
 done_msg = sprintf('\n \n Done acquiring and saving session \n \n');
